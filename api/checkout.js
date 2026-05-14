@@ -9,10 +9,12 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return res.status(503).json({
-    error: "stripe not configured",
-    hint: "set STRIPE_SECRET_KEY in vercel env"
-  });
+  if (!key || /^REPLACE_ME/i.test(key) || !/^(sk_test_|sk_live_|rk_test_|rk_live_)/.test(key)) {
+    return res.status(503).json({
+      error: "stripe not wired yet",
+      hint: "the wall owner needs to add their STRIPE_SECRET_KEY in vercel env, then redeploy."
+    });
+  }
 
   try {
     const body = req.body && typeof req.body === "object"
