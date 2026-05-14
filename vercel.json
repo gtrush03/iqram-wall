@@ -1,0 +1,9 @@
+{
+  "functions": {
+    "api/checkout.js": { "maxDuration": 10 },
+    "api/webhook.js":  { "maxDuration": 10 },
+    "api/comments.js": { "maxDuration": 10 },
+    "api/media.js":    { "maxDuration": 10 },
+    "api/walls.js":    { "maxDuration": 10 }
+  }
+}

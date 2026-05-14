@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>the wall · $1 to post anything</title>
+  <meta name="description" content="one public wall. pay $1+ to post text, photo, or voice. no signup. no moderation theater.">
+  <meta property="og:title" content="the wall · $1 to post anything">
+  <meta property="og:description" content="one public wall. pay $1+ to post text, photo, or voice. no signup. no moderation theater.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #000000;
+      --ink-mute: #737373;
+      --line: #000000;
+      --line-soft: #d9d9d9;
+      --rule-w: 1px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+    body {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 1.5;
+      letter-spacing: 0;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { background: var(--ink); color: var(--bg); }
+    button {
+      font-family: inherit; font-size: inherit; cursor: pointer;
+      background: var(--bg); color: var(--ink);
+      border: var(--rule-w) solid var(--ink);
+      padding: 12px 18px;
+      min-height: 44px;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+    }
+    button:hover { background: var(--ink); color: var(--bg); }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    button.primary { background: var(--ink); color: var(--bg); }
+    button.primary:hover { background: var(--bg); color: var(--ink); }
+
+    input[type="text"], input[type="number"], input[type="url"], textarea, select {
+      font-family: inherit; font-size: inherit; color: inherit;
+      background: var(--bg);
+      border: var(--rule-w) solid var(--ink);
+      padding: 10px 12px;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    textarea { min-height: 100px; resize: vertical; line-height: 1.45; font-family: inherit; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+    .rule { border: 0; border-top: var(--rule-w) solid var(--ink); margin: 28px 0; }
+    .rule.thick { border-top-width: 2px; }
+    .rule.soft { border-top-color: var(--line-soft); }
+
+    /* Header */
+    header.top {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0 12px;
+      border-bottom: var(--rule-w) solid var(--ink);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    header.top .left { display: flex; align-items: center; gap: 10px; }
+    header.top .dollar { font-weight: 700; font-size: 16px; }
+    header.top .right { color: var(--ink-mute); }
+
+    .kicker {
+      margin-top: 32px;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    h1 {
+      font-family: inherit;
+      font-size: clamp(40px, 9vw, 72px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+      margin: 12px 0 20px;
+    }
+    h1 em { font-style: normal; font-weight: 700; }
+    h1 em.under { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; }
+    .lede {
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 520px;
+      color: var(--ink);
+      margin: 0 0 28px;
+    }
+
+    /* Section heading */
+    h2 {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin: 36px 0 12px;
+      display: flex; align-items: baseline; gap: 10px;
+    }
+    h2 .num { color: var(--ink-mute); font-weight: 400; }
+
+    .rules-list, .flow-list { list-style: none; padding: 0; margin: 0; }
+    .rules-list li {
+      padding: 8px 0;
+      border-top: var(--rule-w) dashed var(--line-soft);
+      display: flex; gap: 14px;
+      font-size: 14px;
+    }
+    .rules-list li:first-child { border-top: 0; }
+    .rules-list li::before {
+      content: ">"; color: var(--ink-mute);
+      font-weight: 700;
+    }
+    .flow-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: var(--rule-w) solid var(--line-soft);
+      font-size: 14px;
+    }
+    .flow-list li:first-child { border-top: 0; }
+    .flow-list .step { color: var(--ink-mute); font-weight: 500; }
+
+    /* Compose */
+    .compose {
+      border: 2px solid var(--ink);
+      padding: 18px;
+      margin-top: 20px;
+    }
+    .compose .label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin: 8px 0 6px;
+    }
+    .tabs {
+      display: flex; gap: 0;
+      margin: 0 0 14px 0;
+      border: var(--rule-w) solid var(--ink);
+    }
+    .tabs button {
+      flex: 1; border: 0;
+      border-left: var(--rule-w) solid var(--ink);
+      min-height: 40px;
+    }
+    .tabs button:first-child { border-left: 0; }
+    .tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+    .field { margin: 12px 0; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .amount-row { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+    .amount-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .amount-presets button { padding: 6px 12px; min-height: 36px; font-size: 13px; }
+    .submit-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-top: 16px; flex-wrap: wrap;
+    }
+    .submit-row .total { font-weight: 700; font-size: 16px; }
+    .submit-row .total small { color: var(--ink-mute); font-weight: 400; }
+
+    .wall-switcher {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0;
+      border-top: var(--rule-w) solid var(--ink);
+      border-bottom: var(--rule-w) solid var(--ink);
+      margin-bottom: 18px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+    .wall-switcher .label { font-weight: 700; }
+    .wall-switcher input { width: auto; flex: 1; padding: 6px 10px; min-height: 36px; }
+    .wall-switcher .swap-btn { padding: 6px 12px; min-height: 36px; font-size: 13px; }
+    .wall-switcher .results { background: var(--bg); border: var(--rule-w) solid var(--ink); padding: 8px; max-height: 200px; overflow-y: auto; }
+    .wall-switcher .results button {
+      width: 100%; text-align: left; border: 0;
+      padding: 6px 8px; min-height: 32px; background: transparent;
+    }
+    .wall-switcher .results button:hover { background: var(--ink); color: var(--bg); }
+
+    /* The wall */
+    .wall-feed { display: flex; flex-direction: column; gap: 0; }
+    .post {
+      padding: 18px 0;
+      border-top: var(--rule-w) solid var(--ink);
+      display: grid; gap: 8px;
+    }
+    .post:last-child { border-bottom: var(--rule-w) solid var(--ink); }
+    .post .meta {
+      display: flex; flex-wrap: wrap; gap: 8px 14px;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .post .meta .amt { color: var(--ink); font-weight: 700; }
+    .post .body { font-size: 15px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+    .post .body a { color: inherit; }
+    .post .by { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.04em; }
+    .post img.media { max-width: 100%; height: auto; display: block; border: var(--rule-w) solid var(--ink); }
+    .post audio { width: 100%; }
+
+    .toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--bg);
+      padding: 10px 16px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      z-index: 9999;
+    }
+    .empty { color: var(--ink-mute); padding: 20px 0; text-align: center; font-style: normal; }
+    .ascii { white-space: pre; line-height: 1; font-size: 11px; color: var(--ink); letter-spacing: 0; }
+    .hidden { display: none !important; }
+
+    footer.bot {
+      margin-top: 60px; padding: 18px 0;
+      border-top: 2px solid var(--ink);
+      display: flex; flex-direction: column; gap: 6px;
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute);
+    }
+
+    /* Genie watermark — keep tiny, lower-left so it doesn't fight the wall */
+    .genie-mark {
+      position: fixed; bottom: 12px; left: 12px;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 10px;
+      background: var(--bg);
+      border: var(--rule-w) solid var(--ink);
+      color: var(--ink);
+      font: 10px/1 'JetBrains Mono', monospace;
+      letter-spacing: 0.16em;
+      text-decoration: none;
+      text-transform: uppercase;
+      z-index: 9999;
+    }
+    .genie-mark:hover { background: var(--ink); color: var(--bg); }
+
+    @media (max-width: 480px) {
+      body { font-size: 13px; padding-left: 16px; padding-right: 16px; }
+      .row { grid-template-columns: 1fr; }
+      .submit-row { flex-direction: column; align-items: stretch; }
+      .submit-row button { width: 100%; }
+      .compose { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="top" aria-label="header">
+  <div class="left"><span class="dollar">$</span><span id="walltag">@iqram</span></div>
+  <div class="right" id="datestamp">—</div>
+</header>
+
+<div class="kicker" id="kicker">// public board · $1 minimum</div>
+<h1>pay a dollar. <em class="under">say anything.</em></h1>
+<p class="lede" id="lede">one wall. anyone can post. one dollar minimum. text, photo, or voice. paid posts stay on the wall forever.</p>
+
+<div class="rules-bar" style="display:flex; gap: 10px; flex-wrap: wrap;">
+  <button class="primary" onclick="document.getElementById('compose').scrollIntoView({behavior:'smooth'})">[ leave a comment ]</button>
+  <button onclick="document.getElementById('wall').scrollIntoView({behavior:'smooth'})">[ view the wall ↓ ]</button>
+</div>
+
+<h2><span class="num">// 01</span> the rules</h2>
+<ul class="rules-list">
+  <li>this is a public comment board.</li>
+  <li>you pay at least $1 through stripe.</li>
+  <li>your comment goes on the wall.</li>
+  <li>anyone on the internet can read it.</li>
+  <li>that's the whole product.</li>
+</ul>
+
+<h2><span class="num">// 02</span> the flow</h2>
+<ol class="flow-list">
+  <li><span class="step">01</span><span><strong>compose</strong> — write text, upload a photo, or record a voice note.</span></li>
+  <li><span class="step">02</span><span><strong>choose wall</strong> — default: @iqram. switch via jelly username search.</span></li>
+  <li><span class="step">03</span><span><strong>pay</strong> — stripe checkout. $1 minimum. pay more if you want.</span></li>
+  <li><span class="step">04</span><span><strong>post</strong> — comment is written to a public github gist and appears on the wall.</span></li>
+  <li><span class="step">05</span><span><strong>read</strong> — anyone scrolls the wall. no login required.</span></li>
+</ol>
+
+<h2 id="compose"><span class="num">// 03</span> compose</h2>
+
+<div class="wall-switcher" role="region" aria-label="wall switcher">
+  <span class="label">wall →</span>
+  <input id="walls-search" type="text" placeholder="@iqram (type to switch)" autocomplete="off" spellcheck="false">
+  <button class="swap-btn" id="walls-go" type="button">go</button>
+</div>
+<div class="wall-switcher results hidden" id="walls-results"></div>
+
+<form class="compose" id="compose-form" autocomplete="off">
+  <div class="tabs" role="tablist" aria-label="format">
+    <button type="button" role="tab" aria-selected="true"  data-kind="text">[ text ]</button>
+    <button type="button" role="tab" aria-selected="false" data-kind="photo">[ photo ]</button>
+    <button type="button" role="tab" aria-selected="false" data-kind="voice">[ voice ]</button>
+  </div>
+
+  <!-- text -->
+  <div class="field" data-pane="text">
+    <div class="label">your message · max 600 chars</div>
+    <textarea id="text-input" maxlength="600" placeholder="shout your startup. confess a crush. plug your soundcloud. the wall doesn't care."></textarea>
+    <div class="label" id="text-counter" style="text-align:right; margin-top:4px;">0 / 600</div>
+  </div>
+
+  <!-- photo -->
+  <div class="field hidden" data-pane="photo">
+    <div class="label">photo · jpg / png / webp · max 3mb</div>
+    <input type="file" id="photo-input" accept="image/png,image/jpeg,image/webp,image/gif">
+    <div id="photo-preview" class="label" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- voice -->
+  <div class="field hidden" data-pane="voice">
+    <div class="label">voice · record in browser · up to ~60s</div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <button type="button" id="rec-start">[ start recording ]</button>
+      <button type="button" id="rec-stop" disabled>[ stop ]</button>
+      <span class="label" id="rec-status">idle</span>
+    </div>
+    <audio id="rec-playback" controls class="hidden" style="margin-top:10px; width:100%;"></audio>
+  </div>
+
+  <hr class="rule soft">
+
+  <div class="row">
+    <div class="field">
+      <div class="label">your name (optional)</div>
+      <input id="name-input" type="text" maxlength="60" placeholder="anonymous">
+    </div>
+    <div class="field">
+      <div class="label">a link (optional)</div>
+      <input id="url-input" type="text" maxlength="300" placeholder="https://your.link">
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="label">amount · $1 minimum</div>
+    <div class="amount-row">
+      <span style="font-weight:700; font-size:18px;">$</span>
+      <input id="amount-input" type="number" min="1" max="1000" step="1" value="1" inputmode="decimal">
+    </div>
+    <div class="amount-presets">
+      <button type="button" data-amt="1">[ $1 ]</button>
+      <button type="button" data-amt="5">[ $5 ]</button>
+      <button type="button" data-amt="10">[ $10 ]</button>
+      <button type="button" data-amt="25">[ $25 ]</button>
+      <button type="button" data-amt="100">[ $100 ]</button>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <div class="total">total: <span id="total-display">$1</span> <small>· non-refundable · paid posts are public</small></div>
+    <button class="primary" type="submit" id="submit-btn">[ continue to stripe → ]</button>
+  </div>
+</form>
+
+<h2 id="wall"><span class="num">// 04</span> the wall <span id="wall-count" style="color:var(--ink-mute); font-weight:400; letter-spacing:0.12em;"></span></h2>
+
+<div class="wall-feed" id="wall-feed">
+  <div class="empty" id="wall-empty">— loading wall —</div>
+</div>
+
+<h2><span class="num">// 05</span> the pitch</h2>
+<p style="font-size: 18px; line-height: 1.45; font-weight: 500; margin: 12px 0;">
+  it's an ad slot the size of a sentence.
+</p>
+<p style="font-size: 14px; color: var(--ink); margin: 0 0 6px;">
+  people aren't commenting. they're renting a line on the wall for a dollar. shout your startup. confess a crush. plug your soundcloud. the wall doesn't care.
+</p>
+
+<hr class="rule">
+
+<footer class="bot">
+  <div>$1 · one line · forever on the wall.</div>
+  <div>no signup · no account · just stripe + a sentence</div>
+  <div>posts stored in a public github gist · payments via stripe</div>
+  <div id="wall-status">wall: @iqram</div>
+</footer>
+
+<a href="https://jelly-claw.com" target="_blank" rel="noopener" class="genie-mark">
+  <span style="font-weight:700;">$</span><span>genie</span>
+</a>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  // --- State
+  const state = {
+    wall: (new URLSearchParams(location.search).get("wall") || "iqram").toLowerCase().replace(/^@/, ""),
+    kind: "text",
+    media: null,             // { id, mime }
+    recording: { mediaRecorder: null, chunks: [], blob: null },
+    submitting: false
+  };
+
+  // --- Date stamp
+  function fmtDate(t) {
+    const d = new Date(t);
+    const Y = d.getUTCFullYear(), M = String(d.getUTCMonth()+1).padStart(2,"0"), D = String(d.getUTCDate()).padStart(2,"0");
+    const h = String(d.getUTCHours()).padStart(2,"0"), m = String(d.getUTCMinutes()).padStart(2,"0");
+    return `${Y}-${M}-${D} ${h}:${m} utc`;
+  }
+  $("#datestamp").textContent = fmtDate(Date.now());
+
+  // --- Set wall in DOM
+  function setWall(w) {
+    state.wall = w;
+    $("#walltag").textContent = "@" + w;
+    $("#wall-status").textContent = "wall: @" + w;
+    $("#walls-search").placeholder = "@" + w + " (type to switch)";
+    const url = new URL(location);
+    url.searchParams.set("wall", w);
+    history.replaceState(null, "", url);
+    loadWall();
+  }
+
+  // --- Tabs
+  $$(".tabs button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      $$(".tabs button").forEach(b => b.setAttribute("aria-selected", "false"));
+      btn.setAttribute("aria-selected", "true");
+      state.kind = btn.dataset.kind;
+      $$("[data-pane]").forEach(p => p.classList.add("hidden"));
+      $(`[data-pane="${state.kind}"]`).classList.remove("hidden");
+      state.media = null;
+      $("#photo-preview").textContent = "";
+      $("#rec-playback").classList.add("hidden");
+      $("#rec-status").textContent = "idle";
+    });
+  });
+
+  // --- Text counter
+  const ta = $("#text-input");
+  ta.addEventListener("input", () => { $("#text-counter").textContent = `${ta.value.length} / 600`; });
+
+  // --- Amount
+  function amtVal() { return Math.max(1, Math.min(1000, parseInt($("#amount-input").value, 10) || 1)); }
+  function updateTotal() {
+    $("#amount-input").value = amtVal();
+    $("#total-display").textContent = `$${amtVal()}`;
+  }
+  $("#amount-input").addEventListener("input", updateTotal);
+  $$(".amount-presets button").forEach(b => b.addEventListener("click", () => {
+    $("#amount-input").value = b.dataset.amt;
+    updateTotal();
+  }));
+  updateTotal();
+
+  // --- Photo upload
+  $("#photo-input").addEventListener("change", async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.size > 3_500_000) { toast("file too large (max 3mb)"); return; }
+    $("#photo-preview").textContent = `uploading ${f.name} (${Math.round(f.size/1024)}kb)…`;
+    try {
+      const b64 = await fileToBase64(f);
+      const r = await fetch("/api/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mime: f.type, data: b64 })
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "upload failed");
+      state.media = { id: data.id, mime: f.type };
+      $("#photo-preview").innerHTML = `✓ uploaded · <code>${data.id.slice(0,12)}…</code>`;
+    } catch (err) {
+      $("#photo-preview").textContent = "upload failed: " + err.message;
+      state.media = null;
+    }
+  });
+
+  // --- Voice recording
+  $("#rec-start").addEventListener("click", async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus"
+                 : MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm"
+                 : MediaRecorder.isTypeSupported("audio/mp4") ? "audio/mp4"
+                 : "";
+      const mr = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      state.recording.chunks = [];
+      mr.ondataavailable = (e) => { if (e.data && e.data.size) state.recording.chunks.push(e.data); };
+      mr.onstop = async () => {
+        const blob = new Blob(state.recording.chunks, { type: mr.mimeType || "audio/webm" });
+        state.recording.blob = blob;
+        const url = URL.createObjectURL(blob);
+        const pb = $("#rec-playback");
+        pb.src = url; pb.classList.remove("hidden");
+        $("#rec-status").textContent = `recorded ${Math.round(blob.size/1024)}kb · uploading…`;
+        try {
+          const b64 = await blobToBase64(blob);
+          const r = await fetch("/api/media", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mime: blob.type.split(";")[0], data: b64 })
+          });
+          const data = await r.json();
+          if (!r.ok) throw new Error(data.error || "upload failed");
+          state.media = { id: data.id, mime: blob.type };
+          $("#rec-status").textContent = `uploaded · ${data.id.slice(0,12)}…`;
+        } catch (err) {
+          $("#rec-status").textContent = "upload failed: " + err.message;
+          state.media = null;
+        }
+        stream.getTracks().forEach(t => t.stop());
+      };
+      mr.start();
+      state.recording.mediaRecorder = mr;
+      $("#rec-status").textContent = "recording…";
+      $("#rec-start").disabled = true;
+      $("#rec-stop").disabled = false;
+      setTimeout(() => { if (mr.state === "recording") $("#rec-stop").click(); }, 60_000);
+    } catch (err) {
+      $("#rec-status").textContent = "mic blocked: " + err.message;
+    }
+  });
+  $("#rec-stop").addEventListener("click", () => {
+    const mr = state.recording.mediaRecorder;
+    if (mr && mr.state === "recording") mr.stop();
+    $("#rec-start").disabled = false;
+    $("#rec-stop").disabled = true;
+  });
+
+  // --- Wall switcher search
+  const wsInput = $("#walls-search");
+  let wsT;
+  wsInput.addEventListener("input", () => {
+    clearTimeout(wsT);
+    const q = wsInput.value.trim().replace(/^@/, "");
+    if (!q) { $("#walls-results").classList.add("hidden"); return; }
+    wsT = setTimeout(async () => {
+      try {
+        const r = await fetch("/api/walls?q=" + encodeURIComponent(q));
+        const data = await r.json();
+        renderWallResults(data.results || []);
+      } catch {}
+    }, 220);
+  });
+  $("#walls-go").addEventListener("click", () => {
+    const v = wsInput.value.trim().replace(/^@/, "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    if (v) { setWall(v); wsInput.value = ""; $("#walls-results").classList.add("hidden"); }
+  });
+  function renderWallResults(rows) {
+    const box = $("#walls-results");
+    if (!rows.length) {
+      box.innerHTML = `<button type="button">no jelly user found — press <strong>go</strong> to use this name anyway</button>`;
+      $$("button", box)[0].addEventListener("click", () => { $("#walls-go").click(); });
+    } else {
+      box.innerHTML = "";
+      rows.forEach(r => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.innerHTML = `<strong>@${r.username}</strong>${r.display && r.display !== r.username ? ` · ${r.display}` : ""}`;
+        b.addEventListener("click", () => { setWall(r.username); wsInput.value = ""; box.classList.add("hidden"); });
+        box.appendChild(b);
+      });
+    }
+    box.classList.remove("hidden");
+  }
+
+  // --- Submit
+  $("#compose-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (state.submitting) return;
+    const amount = amtVal();
+    const kind = state.kind;
+    const text = ta.value.trim();
+    const name = $("#name-input").value.trim();
+    const url  = $("#url-input").value.trim();
+
+    if (kind === "text" && !text) { toast("write something first"); return; }
+    if ((kind === "photo" || kind === "voice") && !state.media) { toast(kind === "photo" ? "upload a photo first" : "record a voice note first"); return; }
+
+    state.submitting = true;
+    $("#submit-btn").disabled = true;
+    $("#submit-btn").textContent = "[ creating checkout… ]";
+    try {
+      const r = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wall: state.wall,
+          amount_cents: amount * 100,
+          kind, text, name, url,
+          media_id: state.media?.id || ""
+        })
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || ("checkout failed (" + r.status + ")"));
+      if (!data.url) throw new Error("no checkout url returned");
+      location.href = data.url;
+    } catch (err) {
+      toast("checkout error: " + err.message);
+      $("#submit-btn").disabled = false;
+      $("#submit-btn").textContent = "[ continue to stripe → ]";
+      state.submitting = false;
+    }
+  });
+
+  // --- Wall feed
+  async function loadWall() {
+    const feed = $("#wall-feed");
+    const empty = $("#wall-empty");
+    feed.innerHTML = `<div class="empty">— loading @${state.wall} —</div>`;
+    try {
+      const r = await fetch("/api/comments?wall=" + encodeURIComponent(state.wall) + "&t=" + Date.now());
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "load failed");
+      const items = data.comments || [];
+      $("#wall-count").textContent = items.length ? `· ${items.length}` : "· empty";
+      if (!items.length) {
+        feed.innerHTML = `<div class="empty">no paid posts on @${state.wall} yet. be the first.</div>`;
+        return;
+      }
+      feed.innerHTML = "";
+      items.forEach(c => feed.appendChild(renderPost(c)));
+    } catch (err) {
+      feed.innerHTML = `<div class="empty">failed to load wall: ${escapeHTML(err.message)}</div>`;
+    }
+  }
+
+  function renderPost(c) {
+    const wrap = document.createElement("article");
+    wrap.className = "post";
+    const dt = new Date(c.paid_at || c.created_at || Date.now());
+    const amt = ((c.amount_paid_cents || c.amount_cents) / 100).toFixed(2).replace(/\.00$/, "");
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.innerHTML = `<span class="amt">$${amt}</span><span>${c.kind}</span><span>${fmtDate(dt)}</span>`;
+    wrap.appendChild(meta);
+
+    if (c.kind === "text") {
+      const b = document.createElement("div");
+      b.className = "body";
+      b.textContent = c.text || "";
+      wrap.appendChild(b);
+    } else if (c.kind === "photo" && c.media_id) {
+      const img = document.createElement("img");
+      img.className = "media";
+      img.loading = "lazy";
+      img.alt = "wall photo";
+      // Pull base64 via /api/media?id=…
+      fetch("/api/media?id=" + c.media_id).then(r => r.json()).then(m => {
+        if (m && m.data) img.src = `data:${m.mime};base64,${m.data}`;
+      });
+      wrap.appendChild(img);
+      if (c.text) {
+        const b = document.createElement("div");
+        b.className = "body"; b.textContent = c.text;
+        wrap.appendChild(b);
+      }
+    } else if (c.kind === "voice" && c.media_id) {
+      const audio = document.createElement("audio");
+      audio.controls = true; audio.preload = "metadata";
+      fetch("/api/media?id=" + c.media_id).then(r => r.json()).then(m => {
+        if (m && m.data) audio.src = `data:${m.mime};base64,${m.data}`;
+      });
+      wrap.appendChild(audio);
+      if (c.text) {
+        const b = document.createElement("div");
+        b.className = "body"; b.textContent = c.text;
+        wrap.appendChild(b);
+      }
+    }
+
+    if (c.name || c.url) {
+      const by = document.createElement("div");
+      by.className = "by";
+      const safeName = escapeHTML(c.name || "anonymous");
+      if (c.url) by.innerHTML = `— <a href="${escapeAttr(c.url)}" target="_blank" rel="nofollow noopener">${safeName} ↗</a>`;
+      else by.textContent = "— " + safeName;
+      wrap.appendChild(by);
+    }
+    return wrap;
+  }
+
+  function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+  function escapeAttr(s) { return escapeHTML(s); }
+  function fileToBase64(f) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result).split(",", 2)[1] || "");
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    });
+  }
+  function blobToBase64(b) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result).split(",", 2)[1] || "");
+      r.onerror = rej;
+      r.readAsDataURL(b);
+    });
+  }
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg; t.classList.remove("hidden");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.add("hidden"), 2400);
+  }
+
+  // After-payment toast
+  const params = new URLSearchParams(location.search);
+  if (params.get("posted")) {
+    toast("posted to the wall. thank you.");
+    history.replaceState(null, "", location.pathname + "?wall=" + state.wall + "#wall");
+  } else if (params.get("cancelled")) {
+    toast("checkout cancelled — try again");
+    history.replaceState(null, "", location.pathname + "?wall=" + state.wall + "#compose");
+  }
+
+  // Initial wall paint
+  setWall(state.wall);
+
+  // Refresh wall on a short interval when the page is visible (catches webhook lag)
+  setInterval(() => { if (document.visibilityState === "visible") loadWall(); }, 12_000);
+</script>
+</body>
+</html>
